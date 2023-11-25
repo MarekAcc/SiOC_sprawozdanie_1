@@ -134,20 +134,53 @@ def apply_filter(image, matrix):
     result = image*resized_matrix
     return result
 
+def interpolacja_liniowa_czerwonego(matrix):
+    matrix_size = matrix.shape[0]
+    for i in range(0,matrix_size,2):
+        for j in range(2,matrix_size,2):
+            matrix[i,j] = (matrix[i,j-1] + matrix[i,j+1])/2
+
+    for kolumna in range(1,matrix_size):
+        for wiersz in range(1,matrix_size-1,2):
+            matrix[wiersz,kolumna] = (matrix[wiersz-1,kolumna] + matrix[wiersz+1,kolumna])/2
+    return matrix
+
+def interpolacja_liniowa_zielonego(matrix):
+    matrix_size = matrix.shape[0]
+    for wiersz in range(0,matrix_size,2):
+        for kolumna in range(1,matrix_size-1,2):
+            matrix[wiersz,kolumna] = (matrix[wiersz,kolumna-1] + matrix[wiersz,kolumna+1])/2
+
+    for kolumna in range(0,matrix_size,2):
+        for wiersz in range(1,matrix_size-1,2):
+            matrix[wiersz,kolumna] = (matrix[wiersz-1,kolumna] + matrix[wiersz+1,kolumna])/2
+    return matrix
+
+def interpolacja_liniowa_niebieskiego(matrix):
+    matrix_size = matrix.shape[0]
+    for wiersz in range(1,matrix_size,2):
+        for kolumna in range(1,matrix_size-1,2):
+            matrix[wiersz,kolumna] = (matrix[wiersz,kolumna-1] + matrix[wiersz,kolumna+1])/2
+
+    for kolumna in range(matrix_size):
+        for wiersz in range(2,matrix_size,2):
+            matrix[wiersz,kolumna] = (matrix[wiersz-1,kolumna] + matrix[wiersz+1,kolumna])/2
+    return matrix
+# # Przekształć macierz z powrotem na obraz
 
 def main():
             # Nakładnanie filtru Bayera na obraz, interpolacja i połączenie obrazów.
     with Image.open("kicia.jpeg") as im:
         photo_array = np.array(im)
 
-        red_Bayer_filtr = np.array([[[0,0,0], [0,0,0]],
-                                [[1,0,0], [0,0,0]]])
+        red_Bayer_filtr = np.array([[[0,0,0], [1,0,0]],
+                                [[0,0,0], [0,0,0]]])
         
         green_Bayer_filtr = np.array([[[0,1,0], [0,0,0]],
                                   [[0,0,0], [0,1,0]]])
         
-        blue_Bayer_filtr = np.array([[[0,0,0], [0,0,1]],
-                                 [[0,0,0], [0,0,0]]])
+        blue_Bayer_filtr = np.array([[[0,0,0], [0,0,0]],
+                                 [[0,0,1], [0,0,0]]])
 
         red_Fuji_filtr = np.array([[[0,0,0], [0,0,0], [1,0,0], [0,0,0], [1,0,0], [0,0,0]],
                                 [[1,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0]],
@@ -173,9 +206,19 @@ def main():
         red = apply_filter(photo_array, red_Bayer_filtr)[:, :, 0]
         green = apply_filter(photo_array, green_Bayer_filtr)[:, :, 1]
         blue = apply_filter(photo_array, blue_Bayer_filtr)[:, :, 2]
-        print("Fragment macierzy wynikowej:")
-        print(green[:5, :5])
 
+        red = interpolacja_liniowa_czerwonego(red)
+        green = interpolacja_liniowa_zielonego(green)
+        blue = interpolacja_liniowa_niebieskiego(blue)
+
+        red = (red * 255 / 256).astype(np.uint8)
+        green = (green * 255 / 256).astype(np.uint8)
+        blue = (blue * 255 / 256).astype(np.uint8)
+
+        image_tmp = np.dstack((red,green,blue))
+        final_image= Image.fromarray(image_tmp)
+        final_image.show(title='udało się')
+    
 
 if __name__ == '__main__':
     main()
