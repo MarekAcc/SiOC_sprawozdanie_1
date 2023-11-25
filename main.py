@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from PIL import Image
 
 # Interpolacja liniowa
 def linear(x1, y1, x2):
@@ -8,7 +9,10 @@ def linear(x1, y1, x2):
     # Porównaj każdą wartość z wektora x2 z wartościami wektora x1 aby sprawdzić w którym przedziale znajduje się punkt.
     for i in range (len(x2)):
         for j in range (len(x1)):
-            if x2[i] <= x1[j]:
+            if x2[i] == x1[j]:
+                y2.append(y1[j])
+                break
+            elif x2[i] < x1[j]:
 
                 # Oblicz wagi na podstawie odległości nowego punktu od 2 sąsiadujących
                 w1 = x1[j] - x2[i]
@@ -120,3 +124,58 @@ def cubic_interpolation(x1,x2,y1):
                 if x2[j] >= x1[i] and x2[j] < x1[i+3]:
                     tmp = factors[0]*x2[j]**3 + factors[1]*x2[j]**2 + factors[2]*x2[j] + factors[3]
                     y2.append(tmp)
+
+def apply_filter(image, matrix):
+    # resize matrix
+    resized_matrix = np.tile(matrix, ( (image.shape[0] // matrix.shape[0])+1, (image.shape[1] // matrix.shape[1])+1, 1))
+    resized_matrix = resized_matrix[:image.shape[0], :image.shape[1]]
+
+    # Pomnóż obie macierze przez siebie (element-wise)
+    result = image*resized_matrix
+    return result
+
+
+def main():
+            # Nakładnanie filtru Bayera na obraz, interpolacja i połączenie obrazów.
+    with Image.open("kicia.jpeg") as im:
+        photo_array = np.array(im)
+
+        red_Bayer_filtr = np.array([[[0,0,0], [0,0,0]],
+                                [[1,0,0], [0,0,0]]])
+        
+        green_Bayer_filtr = np.array([[[0,1,0], [0,0,0]],
+                                  [[0,0,0], [0,1,0]]])
+        
+        blue_Bayer_filtr = np.array([[[0,0,0], [0,0,1]],
+                                 [[0,0,0], [0,0,0]]])
+
+        red_Fuji_filtr = np.array([[[0,0,0], [0,0,0], [1,0,0], [0,0,0], [1,0,0], [0,0,0]],
+                                [[1,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0]],
+                                [[0,0,0], [0,0,0], [0,0,0], [1,0,0], [0,0,0], [0,0,0]],
+                                [[0,0,0], [1,0,0], [0,0,0], [0,0,0], [0,0,0], [1,0,0]],
+                                [[0,0,0], [0,0,0], [0,0,0], [1,0,0], [0,0,0], [0,0,0]],
+                                [[1,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0]]])
+
+        green_Fuji_filtr = np.array([[[0,1,0], [0,0,0], [0,0,0], [0,1,0], [0,0,0], [0,0,0]],
+                                [[0,0,0], [0,1,0], [0,1,0], [0,0,0], [0,1,0], [0,1,0]],
+                                [[0,0,0], [0,1,0], [0,1,0], [0,0,0], [0,1,0], [0,1,0]],
+                                [[0,1,0], [0,0,0], [0,0,0], [0,1,0], [0,0,0], [0,0,0]],
+                                [[0,0,0], [0,1,0], [0,1,0], [0,0,0], [0,1,0], [0,1,0]],
+                                [[0,0,0], [0,1,0], [0,1,0], [0,0,0], [0,1,0], [0,1,0]]])
+        
+        blue_Fuji_filtr = np.array([[[0,0,0], [0,0,1], [0,0,0], [0,0,0], [0,0,0], [0,0,1]],
+                                [[0,0,0], [0,0,0], [0,0,0], [0,0,1], [0,0,0], [0,0,0]],
+                                [[0,0,1], [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0]],
+                                [[0,0,0], [0,0,0], [0,0,1], [0,0,0], [0,0,1], [0,0,0]],
+                                [[0,0,1], [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0]],
+                                [[0,0,0], [0,0,0], [0,0,0], [0,0,1], [0,0,0], [0,0,0]]])
+
+        red = apply_filter(photo_array, red_Bayer_filtr)[:, :, 0]
+        green = apply_filter(photo_array, green_Bayer_filtr)[:, :, 1]
+        blue = apply_filter(photo_array, blue_Bayer_filtr)[:, :, 2]
+        print("Fragment macierzy wynikowej:")
+        print(green[:5, :5])
+
+
+if __name__ == '__main__':
+    main()
