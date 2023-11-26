@@ -135,42 +135,45 @@ def apply_filter(image, matrix):
     return result
 
 def interpolacja_liniowa_czerwonego(matrix):
-    matrix_size = matrix.shape[0]
-    for i in range(0,matrix_size,2):
-        for j in range(2,matrix_size,2):
+    matrix_size_rows = matrix.shape[0]
+    matrix_size_col = matrix.shape[1]
+    for i in range(0,matrix_size_rows,2):
+        for j in range(2,matrix_size_col,2):
             matrix[i,j] = (matrix[i,j-1] + matrix[i,j+1])/2
 
-    for kolumna in range(1,matrix_size):
-        for wiersz in range(1,matrix_size-1,2):
+    for kolumna in range(1,matrix_size_col):
+        for wiersz in range(1,matrix_size_rows-1,2):
             matrix[wiersz,kolumna] = (matrix[wiersz-1,kolumna] + matrix[wiersz+1,kolumna])/2
     return matrix
 
 def interpolacja_liniowa_zielonego(matrix):
-    matrix_size = matrix.shape[0]
-    for wiersz in range(0,matrix_size,2):
-        for kolumna in range(1,matrix_size-1,2):
+    matrix_size_rows = matrix.shape[0]
+    matrix_size_col = matrix.shape[1]
+    for wiersz in range(0,matrix_size_rows,2):
+        for kolumna in range(1,matrix_size_col-1,2):
             matrix[wiersz,kolumna] = (matrix[wiersz,kolumna-1] + matrix[wiersz,kolumna+1])/2
 
-    for kolumna in range(0,matrix_size,2):
-        for wiersz in range(1,matrix_size-1,2):
+    for kolumna in range(0,matrix_size_col,2):
+        for wiersz in range(1,matrix_size_rows-1,2):
             matrix[wiersz,kolumna] = (matrix[wiersz-1,kolumna] + matrix[wiersz+1,kolumna])/2
     return matrix
 
 def interpolacja_liniowa_niebieskiego(matrix):
-    matrix_size = matrix.shape[0]
-    for wiersz in range(1,matrix_size,2):
-        for kolumna in range(1,matrix_size-1,2):
+    matrix_size_rows = matrix.shape[0]
+    matrix_size_col = matrix.shape[1]
+    for wiersz in range(1,matrix_size_rows,2):
+        for kolumna in range(1,matrix_size_col-1,2):
             matrix[wiersz,kolumna] = (matrix[wiersz,kolumna-1] + matrix[wiersz,kolumna+1])/2
 
-    for kolumna in range(matrix_size):
-        for wiersz in range(2,matrix_size,2):
+    for kolumna in range(matrix_size_col):
+        for wiersz in range(2,matrix_size_rows,2):
             matrix[wiersz,kolumna] = (matrix[wiersz-1,kolumna] + matrix[wiersz+1,kolumna])/2
     return matrix
 # # Przekształć macierz z powrotem na obraz
 
 def main():
             # Nakładnanie filtru Bayera na obraz, interpolacja i połączenie obrazów.
-    with Image.open("kicia.jpeg") as im:
+    with Image.open("prom.jpg") as im:
         photo_array = np.array(im)
 
         red_Bayer_filtr = np.array([[[0,0,0], [1,0,0]],
