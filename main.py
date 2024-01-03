@@ -170,7 +170,7 @@ def interpolacja_liniowa_niebieskiego(matrix):
             matrix[wiersz,kolumna] = (matrix[wiersz-1,kolumna] + matrix[wiersz+1,kolumna])/2
     return matrix
 
-def srednia_macierzy(matrix):
+def suma_macierzy(matrix):
     sum = 0
     matrix_size_rows = matrix.shape[0]
     matrix_size_col = matrix.shape[1]
@@ -182,16 +182,24 @@ def wyłuskaj_podmacierz(macierz, start_wiersz, start_kolumna, liczba_wierszy, l
     podmacierz = np.array(macierz[start_wiersz:start_wiersz+liczba_wierszy, start_kolumna:start_kolumna+liczba_kolumn])
     return podmacierz
 
-def interpolacja_fuji(matrix, matrix_kopia):
-    #wyłuskaj macierz
+def interpolacja_fuji(matrix, matrix_kopia,kolor):
+    if kolor == "red" or kolor == "blue":
+        dzielnik = 8
+    elif kolor == "green":
+        dzielnik = 20
+    else:
+        return
     matrix_size_rows = matrix.shape[0]
     matrix_size_col = matrix.shape[1]
-    for wiersz in range(1,matrix_size_rows):
-        for kolumna in range(1,matrix_size_col-1):
+    for wiersz in range(2,matrix_size_rows):
+        for kolumna in range(2,matrix_size_col-1):
             if wiersz == matrix_size_rows-1 or kolumna == matrix_size_col-1:
                 break
-            podmacierz = wyłuskaj_podmacierz(matrix, wiersz-1, kolumna-1, 4,4)
-            matrix_kopia[wiersz][kolumna] = srednia_macierzy(podmacierz)
+            if matrix[wiersz][kolumna] != 0:
+                continue
+
+            podmacierz = wyłuskaj_podmacierz(matrix, wiersz-2, kolumna-2, 6,6)
+            matrix_kopia[wiersz][kolumna] = suma_macierzy(podmacierz)/dzielnik
 
 def main():
             # Nakładnanie filtru Bayera na obraz, interpolacja i połączenie obrazów.
@@ -228,6 +236,8 @@ def main():
                                 [[0,0,1], [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0]],
                                 [[0,0,0], [0,0,0], [0,0,0], [0,0,1], [0,0,0], [0,0,0]]])
 
+
+        # -----INTERPOLACJA LINIOWA----------------------------------
         # red = apply_filter(photo_array, red_Bayer_filtr)[:, :, 0]
         # green = apply_filter(photo_array, green_Bayer_filtr)[:, :, 1]
         # blue = apply_filter(photo_array, blue_Bayer_filtr)[:, :, 2]
@@ -243,13 +253,44 @@ def main():
         # image_tmp = np.dstack((red,green,blue))
         # final_image= Image.fromarray(image_tmp)
         # final_image.show(title='udało się')
-        red = apply_filter(photo_array,red_Fuji_filtr)[:, :,0]
-        red_wynikowa = red.copy()
-        interpolacja_fuji(red, red_wynikowa)
-        print("Fragment macierzy przed:")
-        print(red[:10, :10])
-        print("Fragment macierzy wynikowej:")
-        print(red_wynikowa[:10, :10])
+        # -----------------------------------------------------------
+        
+
+        # ---------Interpolacja Fiji------------------------
+        red = apply_filter(photo_array,red_Fuji_filtr)
+        green = apply_filter(photo_array,green_Fuji_filtr)
+        blue = apply_filter(photo_array,blue_Fuji_filtr)
+
+        result_image = red.astype(np.uint8)
+        plt.imshow(result_image)
+        plt.show()
+        result_image = green.astype(np.uint8)
+        plt.imshow(result_image)
+        plt.show()
+        result_image = blue.astype(np.uint8)
+        plt.imshow(result_image)
+        plt.show()
+
+        # red_wynikowa = red.copy()
+        # green_wynikowa = green.copy()
+        # blue_wynikowa = blue.copy()
+
+        # interpolacja_fuji(red, red_wynikowa,"red")
+        # interpolacja_fuji(green, green_wynikowa,"green")
+        # interpolacja_fuji(blue, blue_wynikowa,"blue")
+
+        # red_wynikowa = (red_wynikowa * 255 / 256).astype(np.uint8)
+        # green_wynikowa = (green_wynikowa * 255 / 256).astype(np.uint8)
+        # blue_wynikowa = (blue_wynikowa * 255 / 256).astype(np.uint8)
+
+        # image_tmp = np.dstack((red_wynikowa,green_wynikowa,blue_wynikowa))
+        # final_image= Image.fromarray(image_tmp)
+        # final_image.show(title='udało się')
+
+        # print("Fragment macierzy przed:")
+        # print(green[:6, :6])
+        # print("Fragment macierzy wynikowej:")
+        # print(green_wynikowa[:10, :10])
 
     
 
