@@ -200,7 +200,9 @@ def interpolacja_fuji(matrix, matrix_kopia,kolor):
 
             podmacierz = wyłuskaj_podmacierz(matrix, wiersz-2, kolumna-2, 6,6)
             matrix_kopia[wiersz][kolumna] = suma_macierzy(podmacierz)/dzielnik
-
+def obr_pkt(R,punkt):
+    nwynik = np.dot(R, punkt)
+    print(nwynik)
 def main():
             # Nakładnanie filtru Bayera na obraz, interpolacja i połączenie obrazów.
     with Image.open("kicia.jpeg") as im:
@@ -238,38 +240,38 @@ def main():
 
 
         # -----INTERPOLACJA LINIOWA----------------------------------
-        # red = apply_filter(photo_array, red_Bayer_filtr)[:, :, 0]
-        # green = apply_filter(photo_array, green_Bayer_filtr)[:, :, 1]
-        # blue = apply_filter(photo_array, blue_Bayer_filtr)[:, :, 2]
+        red = apply_filter(photo_array, red_Bayer_filtr)[:, :, 0]
+        green = apply_filter(photo_array, green_Bayer_filtr)[:, :, 1]
+        blue = apply_filter(photo_array, blue_Bayer_filtr)[:, :, 2]
 
-        # red = interpolacja_liniowa_czerwonego(red)
-        # green = interpolacja_liniowa_zielonego(green)
-        # blue = interpolacja_liniowa_niebieskiego(blue)
+        red = interpolacja_liniowa_czerwonego(red)
+        green = interpolacja_liniowa_zielonego(green)
+        blue = interpolacja_liniowa_niebieskiego(blue)
 
-        # red = (red * 255 / 256).astype(np.uint8)
-        # green = (green * 255 / 256).astype(np.uint8)
-        # blue = (blue * 255 / 256).astype(np.uint8)
+        red = (red * 255 / 256).astype(np.uint8)
+        green = (green * 255 / 256).astype(np.uint8)
+        blue = (blue * 255 / 256).astype(np.uint8)
 
-        # image_tmp = np.dstack((red,green,blue))
-        # final_image= Image.fromarray(image_tmp)
-        # final_image.show(title='udało się')
+        image_tmp = np.dstack((red,green,blue))
+        final_image= Image.fromarray(image_tmp)
+        final_image.show(title='udało się')
         # -----------------------------------------------------------
         
 
-        # ---------Interpolacja Fiji------------------------
-        red = apply_filter(photo_array,red_Fuji_filtr)
-        green = apply_filter(photo_array,green_Fuji_filtr)
-        blue = apply_filter(photo_array,blue_Fuji_filtr)
+        # # ---------Interpolacja Fiji------------------------
+        # red = apply_filter(photo_array,red_Fuji_filtr)[:, :, 0]
+        # green = apply_filter(photo_array,green_Fuji_filtr)[:, :, 1]
+        # blue = apply_filter(photo_array,blue_Fuji_filtr)[:, :, 2]
 
-        result_image = red.astype(np.uint8)
-        plt.imshow(result_image)
-        plt.show()
-        result_image = green.astype(np.uint8)
-        plt.imshow(result_image)
-        plt.show()
-        result_image = blue.astype(np.uint8)
-        plt.imshow(result_image)
-        plt.show()
+        # # result_image = red.astype(np.uint8)
+        # # plt.imshow(result_image)
+        # # plt.show()
+        # # result_image = green.astype(np.uint8)
+        # # plt.imshow(result_image)
+        # # plt.show()
+        # # result_image = blue.astype(np.uint8)
+        # # plt.imshow(result_image)
+        # # plt.show()
 
         # red_wynikowa = red.copy()
         # green_wynikowa = green.copy()
@@ -291,6 +293,7 @@ def main():
         # print(green[:6, :6])
         # print("Fragment macierzy wynikowej:")
         # print(green_wynikowa[:10, :10])
+
 
     
 
